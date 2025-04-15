@@ -137,38 +137,38 @@ xlim([-10 0]); ylim([868 920]);
 
 % Density parametrization
 offset = 914;
-x = [T_fyi_mosaic([5:6 8:9 11:13 15:23]) T_leg5 T_bulk];
-y = [rho_fyi_mosaic([5:6 8:9 11:13 15:23]) rho_leg5 rho_si_bulk]-offset;
-z = [h_fyi_mosaic([5:6 8:9 11:13 15:23]) h_leg5 hrho];
+x = [T_fyi_mosaic([5:6 8:9 11:13 15:23]) T_bulk];
+y = [rho_fyi_mosaic([5:6 8:9 11:13 15:23]) rho_si_bulk]-offset;
+z = [h_fyi_mosaic([5:6 8:9 11:13 15:23]) hrho];
 
 % [xData,yData] = prepareCurveData(x,y);
 % ft = fittype('exp1'); opts = fitoptions('Method','NonlinearLeastSquares'); opts.Display = 'Off'; opts.Normalize = 'on'; opts.Robust = 'LAR'; % Set up fittype and options.
 % [fitresult,gof] = fit(xData,yData,ft,opts);
 % Xfit=linspace(min(xData),max(xData),100); Yfit=fitresult(Xfit);
 
-x1 = x(z > 1.0); y1 = y(z > 1.0);
+x1 = x(z > 1.0); y1 = y(z > 1.0); % exponential fit, thick ice
 [xData,yData] = prepareCurveData(x1,y1);
-ft = fittype('exp1'); opts = fitoptions('Method','NonlinearLeastSquares'); opts.Display = 'Off'; opts.Normalize = 'on'; opts.Robust = 'LAR'; % Set up fittype and options.
-[fitresult,~] = fit(xData,yData,ft,opts);
-Xfit1=linspace(min(xData),max(xData),100); Yfit1=fitresult(Xfit);
+ft = fittype('exp1'); opts = fitoptions('Method','NonlinearLeastSquares'); opts.Robust = 'LAR'; % Set up fittype and options
+[fitresult1,~] = fit(xData,yData,ft,opts);
+Xfit1=linspace(min(xData),max(xData),100); Yfit1=fitresult1(Xfit1);
 
-x2 = x(z < 1.0); y2 = y(z < 1.0);
+x2 = x(z < 1.0); y2 = y(z < 1.0); % exponential fit, thin ice
 [xData,yData] = prepareCurveData(x2,y2);
-ft = fittype('exp1'); opts = fitoptions('Method','NonlinearLeastSquares'); opts.Display = 'Off'; opts.Normalize = 'on'; opts.Robust = 'LAR'; % Set up fittype and options.
-[fitresult,~] = fit(xData,yData,ft,opts);
-Xfit2=linspace(min(xData),max(xData),100); Yfit2=fitresult(Xfit);
+ft = fittype('exp1'); opts = fitoptions('Method','NonlinearLeastSquares'); opts.Robust = 'LAR'; % Set up fittype and options
+[fitresult2,~] = fit(xData,yData,ft,opts);
+Xfit2=linspace(min(xData),max(xData),100); Yfit2=fitresult2(Xfit2);
 
 nexttile
 p = plot(T_fyi_mosaic([5:6 8:9 11:13 15:23]),rho_fyi_mosaic([5:6 8:9 11:13 15:23]),'<','Color',c{1},'LineWidth',2); p.MarkerSize = 2; set(p,'markerfacecolor',get(p,'color')); hold on
-p = plot(T_leg5,rho_leg5,'<','Color',c{3},'LineWidth',2); p.MarkerSize = 2; set(p,'markerfacecolor',get(p,'color')); % MOSAiC
+% p = plot(T_leg5,rho_leg5,'<','Color',c{3},'LineWidth',2); p.MarkerSize = 2; set(p,'markerfacecolor',get(p,'color')); % MOSAiC
 p = plot(T_bulk,rho_si_bulk,'o','Color',c{2},'LineWidth',2); p.MarkerSize = 2; set(p,'markerfacecolor',get(p,'color')); % Nansen Legacy
 % plot(Xfit,Yfit+offset,'Color',c{4},'LineWidth',2); % exponential fit, all
 plot(Xfit1,Yfit1+offset,'Color',c{4},'LineWidth',2); % exponential fit, thick ice
 plot(Xfit2,Yfit2+offset,'Color',c{6},'LineWidth',2); % exponential fit, thin ice
 % p = text(-9.5,907,'914.1 - 2.8 exp(1.8T)'); set(p,'Color',c{4},'HorizontalAlignment','left','FontSize',9);
-p = text(-9.5,900.5,'914 - 5.7 exp(1.0T)'); set(p,'Color',c{4},'HorizontalAlignment','left','FontSize',9);
-p = text(-9.5,906.5,'914 - 3.0 exp(1.6T)'); set(p,'Color',c{6},'HorizontalAlignment','left','FontSize',9);
-leg = legend('MOSAiC','','Nansen Legacy','Exp. fit, hi > 1 m','Exp. fit, hi < 1 m','box','off','NumColumns',1); set(leg,'FontSize',8,'Location','southwest'); leg.ItemTokenSize = [30*0.7,18*0.7];
+p = text(-9.7,906.5,'914 - 58.9 exp(1.75 T)'); set(p,'Color',c{4},'HorizontalAlignment','left','FontSize',9); % exponential fit, thick ice
+p = text(-9.7,900.5,'914 - 40.5 exp(0.67 T)'); set(p,'Color',c{6},'HorizontalAlignment','left','FontSize',9); % exponential fit, thin ice
+leg = legend('MOSAiC','Nansen Legacy','Exponential fit, hi > 1 m','Exponential fit, hi < 1 m','box','off','NumColumns',1); set(leg,'FontSize',8,'Location','southwest'); leg.ItemTokenSize = [30*0.7,18*0.7];
 hXLabel = xlabel('Ice temperature (°C)'); hYLabel = ylabel('FYI density (kg  m^-^3)'); set([hXLabel hYLabel gca],'FontSize',8,'FontWeight','normal');
 xlim([-10 0]); ylim([868 920]);
 annotation('textbox',[0 .51 0.02 .51],'String','(a)','EdgeColor','none','HorizontalAlignment','center','FontSize',8);
