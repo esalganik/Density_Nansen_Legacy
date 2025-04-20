@@ -5,17 +5,17 @@ T1 = readtable(project,'Sheet','density');
 T2 = readtable(project,'Sheet','temperature');
 
 n = table2array(T1(:,1)); rho_all = table2array(T1(:,19)); t_all = table2array(T1(:,2)); zzrho_all = table2array(T1(:,9:10)); T_lab_all = table2array(T1(:,11)); Srho_all = table2array(T1(:,12));
-hrho_all = table2array(T1(:,8)); drho_all = table2array(T1(:,8))-table2array(T1(:,6)); vg_orig_all = table2array(T1(:,14)); lon_all = table2array(T1(:,4)); lat_all = table2array(T1(:,5));  
-n2 = table2array(T2(:,1)); hT_all = table2array(T2(:,8)); dT_all = table2array(T2(:,8))-table2array(T2(:,6)); zT_all = table2array(T2(:,9)); T_all = table2array(T2(:,11)); 
+hrho_all = table2array(T1(:,8)); drho_all = table2array(T1(:,8))-table2array(T1(:,6)); vg_orig_all = table2array(T1(:,14)); lon_all = table2array(T1(:,4)); lat_all = table2array(T1(:,5)); sn_all = table2array(T1(:,7));
+n2 = table2array(T2(:,1)); hT_all = table2array(T2(:,8)); dT_all = table2array(T2(:,8))-table2array(T2(:,6)); zT_all = table2array(T2(:,9)); T_all = table2array(T2(:,11));
 
 for i = 1:max(n)
     rho{i} = rho_all(n == i); zzrho{i} = zzrho_all(n == i,:); Srho{i} = Srho_all(n == i); T_lab{i} = T_lab_all(n == i)*0-20; t0{i} = t_all(n == i); t(i) = t0{i}(1);
-    drho{i} = drho_all(n == i); vg_orig{i} = vg_orig_all(n == i); hrho0{i} = hrho_all(n == i); hrho(i) = hrho0{i}(1);
+    drho0{i} = drho_all(n == i); drho(i) = drho0{i}(1); vg_orig{i} = vg_orig_all(n == i); hrho0{i} = hrho_all(n == i); hrho(i) = hrho0{i}(1); snrho0{i} = sn_all(n == i); snrho(i) = snrho0{i}(1);
     lon0{i} = lon_all(n == i); lat0{i} = lat_all(n == i); lon(i) = lon0{i}(1); lat(i) = lat0{i}(1);
     T{i} = T_all(n2 == i); zT{i} = zT_all(n2 == i); dT{i} = dT_all(n2 == i); hT0{i} = hT_all(n2 == i); hT(i) = hT0{i}(1); 
 end
-for i = 31:34; t0{i} = t0{i}-365; t(i) = t(i)-365; end
-clearvars -except n hT hrho dT drho zT zzrho T T_lab Srho rho t t0 hrho0 lon lat c
+for i = 24:27; t0{i} = t0{i}-365; t(i) = t(i)-365; end
+clearvars -except n hT hrho dT drho zT zzrho T T_lab Srho rho t t0 hrho0 lon lat snrho c
 
 for i = 1:max(n)
     zrho{i} = mean(zzrho{i},2) * hrho(i) / zzrho{i}(end,2);
@@ -37,9 +37,9 @@ for i = 1:max(n)
     rho_si{i} = (-vg_pr{i}+1).*rhoi_rho.*F1_rho./(F1_rho-rhoi_rho.*Srho{i}/1000.*F2_rho); rho_si{i}(isnan(vb_rho{i})) = NaN; rho_si{i}(isnan(vb_rho{i})) = NaN; % density
     rho_si_bulk(i) = nanmean(rho_si{i}); T_bulk(i) = nanmean(T_rho{i});
 end
-clearvars -except hT hrho dT drho zT zrho T T_lab Srho rho rho_si vb_rho vg vg_pr t t0 lon lat n rho_si_bulk T_rho T_bulk c
+clearvars -except hT hrho dT drho snrho zT zrho T T_lab Srho rho rho_si vb_rho vg vg_pr t t0 lon lat n rho_si_bulk T_rho T_bulk c
 
-%% Nansen legacy overview: map, density vs time, density vs temperature (6 x 2 in)
+%% Figure 1: Nansen legacy overview: map, density vs time, density vs temperature (6 x 2 in)
 figure
 tile = tiledlayout(1,3); tile.TileSpacing = 'compact'; tile.Padding = 'none'; ax = gobjects(1,3);
 ax(1) = nexttile; % bathymetry
@@ -87,7 +87,7 @@ annotation('textbox',[0.20 .51 0.21 .51],'String','(b)','FontSize',8,'EdgeColor'
 annotation('textbox',[0.40 .51 0.42 .51],'String','(c)','FontSize',8,'EdgeColor','none','HorizontalAlignment','center');
 clearvars ax tile p p1 p2 leg lipari100 hXLabel hYLabel gca cs i 
 
-%% Nansen Legacy vs historical observations
+%% Figure 2: Nansen Legacy vs historical observations
 load("density_historical.mat"); % data import
 
 figure
@@ -114,7 +114,7 @@ annotation('textbox',[0 .51 0.02 .51],'String','(a)','EdgeColor','none','Horizon
 annotation('textbox',[0.34 .51 0.35 .51],'String','(b)','EdgeColor','none','HorizontalAlignment','center','FontSize',8);
 clearvars ax hXLabel hYLabel i leg p T_anal rho_si_cox tile
 
-%% Relationship with ice thickness, parametrization vs ice temperature
+%% Figure 3: Relationship with ice thickness, parametrization vs ice temperature
 figure
 tile = tiledlayout(1,2); tile.TileSpacing = 'compact'; tile.Padding = 'none';
 nexttile
@@ -160,7 +160,7 @@ Xfit2=linspace(min(xData),max(xData),100); Yfit2=fitresult2(Xfit2);
 
 nexttile
 p = plot(T_fyi_mosaic([5:6 8:9 11:13 15:23]),rho_fyi_mosaic([5:6 8:9 11:13 15:23]),'<','Color',c{1},'LineWidth',2); p.MarkerSize = 2; set(p,'markerfacecolor',get(p,'color')); hold on
-% p = plot(T_leg5,rho_leg5,'<','Color',c{3},'LineWidth',2); p.MarkerSize = 2; set(p,'markerfacecolor',get(p,'color')); % MOSAiC
+p = plot(T_leg5,rho_leg5,'<','Color',c{1},'LineWidth',2); p.MarkerSize = 2; set(p,'markerfacecolor',get(p,'color')); % MOSAiC
 p = plot(T_bulk,rho_si_bulk,'o','Color',c{2},'LineWidth',2); p.MarkerSize = 2; set(p,'markerfacecolor',get(p,'color')); % Nansen Legacy
 % plot(Xfit,Yfit+offset,'Color',c{4},'LineWidth',2); % exponential fit, all
 plot(Xfit1,Yfit1+offset,'Color',c{4},'LineWidth',2); % exponential fit, thick ice
@@ -168,8 +168,43 @@ plot(Xfit2,Yfit2+offset,'Color',c{6},'LineWidth',2); % exponential fit, thin ice
 % p = text(-9.5,907,'914.1 - 2.8 exp(1.8T)'); set(p,'Color',c{4},'HorizontalAlignment','left','FontSize',9);
 p = text(-9.7,906.5,'914 - 58.9 exp(1.75 T)'); set(p,'Color',c{4},'HorizontalAlignment','left','FontSize',9); % exponential fit, thick ice
 p = text(-9.7,900.5,'914 - 40.5 exp(0.67 T)'); set(p,'Color',c{6},'HorizontalAlignment','left','FontSize',9); % exponential fit, thin ice
-leg = legend('MOSAiC','Nansen Legacy','Exponential fit, hi > 1 m','Exponential fit, hi < 1 m','box','off','NumColumns',1); set(leg,'FontSize',8,'Location','southwest'); leg.ItemTokenSize = [30*0.7,18*0.7];
+leg = legend('MOSAiC','','Nansen Legacy','Exponential fit, hi > 1 m','Exponential fit, hi < 1 m','box','off','NumColumns',1); set(leg,'FontSize',8,'Location','southwest'); leg.ItemTokenSize = [30*0.7,18*0.7];
 hXLabel = xlabel('Ice temperature (°C)'); hYLabel = ylabel('FYI density (kg  m^-^3)'); set([hXLabel hYLabel gca],'FontSize',8,'FontWeight','normal');
 xlim([-10 0]); ylim([868 920]);
 annotation('textbox',[0 .51 0.02 .51],'String','(a)','EdgeColor','none','HorizontalAlignment','center','FontSize',8);
 annotation('textbox',[0.38 .51 0.38 .51],'String','(b)','EdgeColor','none','HorizontalAlignment','center','FontSize',8);
+
+%% Figure 4: density vs ice thickness and freeboard
+rho_bal = (1024*drho - 300*snrho) ./ hrho;
+
+x1 = hrho; y1 = rho_si_bulk;
+[xData,yData] = prepareCurveData(x1,y1);
+ft = fittype('poly1'); % Set up fittype and options
+[fitresult1,~] = fit(xData,yData,ft);
+Xfit1=linspace(min(xData),max(xData),100); Yfit1=fitresult1(Xfit1);
+
+x2 = hrho-drho; y2 = rho_si_bulk;
+[xData,yData] = prepareCurveData(x2,y2);
+ft = fittype('poly1'); % Set up fittype and options
+[fitresult2,~] = fit(xData,yData,ft);
+Xfit2=linspace(min(xData),max(xData),100); Yfit2=fitresult2(Xfit2);
+
+figure
+tile = tiledlayout(1,2); tile.TileSpacing = 'compact'; tile.Padding = 'none';
+nexttile % density vs thickness
+plot(hrho,rho_si_bulk,'x'); hold on
+plot(hrho,rho_bal,'x');
+plot(Xfit1,Yfit1,'Color','k','LineWidth',2); % linear fit
+
+leg = legend('weighing','coring','linear fit','box','on'); set(leg,'FontSize',7,'Location','northeast'); leg.ItemTokenSize = [30*0.7,18*0.7];
+hXLabel = xlabel('Ice thickness (m)'); hYLabel = ylabel('Ice density (kg  m^-^3)'); set([hXLabel hYLabel gca],'FontSize',8,'FontWeight','normal');
+
+nexttile % density vs freeboard
+plot(hrho-drho,rho_si_bulk,'x'); hold on
+plot(hrho-drho,rho_bal,'x');
+plot(Xfit2,Yfit2,'Color','k','LineWidth',2); % linear fit
+leg = legend('weighing','coring','linear fit','box','on'); set(leg,'FontSize',7,'Location','northeast'); leg.ItemTokenSize = [30*0.7,18*0.7];
+hXLabel = xlabel('Ice freeboard (m)'); hYLabel = ylabel('Ice density (kg  m^-^3)'); set([hXLabel hYLabel gca],'FontSize',8,'FontWeight','normal');
+
+annotation('textbox',[0 .51 0.02 .51],'String','(a)','EdgeColor','none','HorizontalAlignment','center','FontSize',8);
+annotation('textbox',[0.34 .51 0.34 .51],'String','(b)','EdgeColor','none','HorizontalAlignment','center','FontSize',8);
