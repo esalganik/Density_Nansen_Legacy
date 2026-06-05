@@ -1,6 +1,6 @@
 close all; clc; clear;
 
-projectDir = 'C:\Users\evsalg001\Documents\MATLAB\Density parametrization\Nansen Legacy\NL core matching';
+projectDir = 'C:\Users\evsalg001\Documents\MATLAB\Density parametrization\Nansen Legacy\Core_matching';
 rawDir = 'C:\Users\evsalg001\Downloads\Nansen Legacy raw data';
 
 codeDir = fullfile(projectDir, 'code');

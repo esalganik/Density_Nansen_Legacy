@@ -50,6 +50,10 @@ vg_connected = max(0, ...
 
 vg_disconnected = vg_pr;
 
+% This is strict Cox and Weeks, but this is likely wrong as connected = disconnetced
+% isWarming = T_insitu > T_lab;
+% vg_disconnected(isWarming) = max(0, vg_pr(isWarming) + 1 - A(isWarming));
+
 rho_si_connected = ...
     (1 - vg_connected) .* rhoi_i .* F1_i ./ ...
     (F1_i - rhoi_i .* S_used/1000 .* F2_i);
